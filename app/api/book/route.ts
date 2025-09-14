@@ -1,4 +1,14 @@
-import { NextResponse } from "next/server";
+import { NextResponse } from "next/server"; 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*', // tu peux mettre ton domaine au lieu de *
+  'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+};
+
+export function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: corsHeaders });
+}
+
 
 // POST /api/book  (body: { slotId: string, email: string })
 export async function POST(req: Request) {
