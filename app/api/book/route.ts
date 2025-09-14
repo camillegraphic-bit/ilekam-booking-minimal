@@ -1,34 +1,16 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
-// POST /api/book
-// body JSON: { slotId: string, email: string }
+// POST /api/book  (body: { slotId: string, email: string })
 export async function POST(req: Request) {
-  let payload: unknown;
-
   try {
-    payload = await req.json();
+    const { slotId, email } = await req.json();
+    if (!slotId) return NextResponse.json({ error: "slotId manquant" }, { status: 400 });
+    if (!email || !/^\S+@\S+\.\S+$/.test(email))
+      return NextResponse.json({ error: "email invalide" }, { status: 400 });
+
+    const bookingId = `bk_${Math.random().toString(36).slice(2, 10)}`;
+    return NextResponse.json({ ok: true, bookingId, slotId, email });
   } catch {
-    return NextResponse.json({ error: 'Corps JSON invalide' }, { status: 400 });
+    return NextResponse.json({ error: "JSON invalide" }, { status: 400 });
   }
-
-  const { slotId, email } = (payload as any) ?? {};
-
-  if (typeof slotId !== 'string' || !slotId.trim()) {
-    return NextResponse.json({ error: "Champ 'slotId' manquant" }, { status: 400 });
-  }
-  if (typeof email !== 'string' || !/^\S+@\S+\.\S+$/.test(email)) {
-    return NextResponse.json({ error: "Champ 'email' invalide" }, { status: 400 });
-  }
-
-  // Ici, on ferait l’appel Stripe + enregistrement DB.
-  // Pour la démo, on renvoie une confirmation fictive.
-  const bookingId = `bk_${Math.random().toString(36).slice(2, 10)}`;
-
-  return NextResponse.json({
-    ok: true,
-    bookingId,
-    slotId,
-    email,
-    note: 'Placeholder de réservation — intégration Stripe à venir.',
-  });
 }
